@@ -4,7 +4,7 @@
 Ricostruzione completa dagli archivi trimestrali:
     python3 build_stats_archive.py --cache <cartella per i download>
 
-Aggiornamento quotidiano, eseguito da GitHub Actions:
+Aggiornamento quotidiano, eseguito da run_daily.sh:
     python3 build_stats_archive.py --update --cache <cartella per i download>
 
 Le regole devono restare uguali a quelle dell'app che usa questi dati, altrimenti

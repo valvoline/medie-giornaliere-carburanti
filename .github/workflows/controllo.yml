@@ -1,0 +1,32 @@
+name: Controllo dati recenti
+
+# Fallisce, e GitHub avvisa via email, se l'aggiornamento quotidiano si è fermato da oltre 3 giorni.
+# Il file del giorno D contiene i dati di D-1, quindi di norma l'età è 1.
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  controllo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Controlla l'ultimo giorno
+        shell: python3 -I {0}
+        run: |
+          import datetime as dt, json, sys
+
+          with open("site/stats.json", encoding="utf-8") as source:
+              archive = json.load(source)
+          values = archive["series"]["Italia"]["Diesel"]
+          index = max(position for position, value in enumerate(values) if value is not None)
+          last = dt.date.fromisoformat(archive["firstDay"]) + dt.timedelta(days=index)
+          age = (dt.date.today() - last).days
+          print(f"Ultimo giorno: {last}, {age} giorni fa")
+          sys.exit(1 if age > 4 else 0)

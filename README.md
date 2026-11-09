@@ -29,6 +29,8 @@ Sono valori diversi dalle [medie regionali ufficiali](https://www.mimit.gov.it/i
 
 Elaborazione su dati del Ministero delle Imprese e del Made in Italy (MIMIT), Osservaprezzi Carburanti, pubblicati con licenza [IODL 2.0](https://www.dati.gov.it/iodl/2.0/). Questo progetto non è collegato al Ministero.
 
+Le medie di gasolio, benzina e GPL dal 16 al 26 ottobre 2026 vengono da [fuel-prices.eu](https://www.fuel-prices.eu/research/), *Fuel price data for research* (versione 2026-11.3), che elabora gli stessi dati MIMIT con la stessa licenza. Differiscono leggermente da quelle calcolate qui e saranno sostituite quando uscirà l'archivio trimestrale; per quei giorni il metano non è disponibile.
+
 ## Rigenerare i dati
 
 ```sh

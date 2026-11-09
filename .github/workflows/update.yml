@@ -1,0 +1,50 @@
+name: Aggiorna statistiche
+
+# Il MIMIT pubblica verso le 08:50 ora italiana. Gli orari sono UTC e l'esecuzione è ripetuta:
+# GitHub può ritardare o saltare un turno, e il server MIMIT ha errori temporanei.
+on:
+  schedule:
+    - cron: "17 8,9,11,15 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aggiornamento
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Calcola il giorno pubblicato
+        run: python3 -I build_stats_archive.py --update --cache "$RUNNER_TEMP/cache"
+
+      # Anche se il passo prima fallisce per un trimestre: il file resta valido e il giorno è già dentro.
+      - name: Salva
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/stats.json
+          git diff --cached --quiet || { git commit -m "Dati aggiornati al $(date -u +%F)" && git push; }
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        if: ${{ !cancelled() }}
+        with:
+          path: site
+
+      - id: deploy
+        if: ${{ !cancelled() }}
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
